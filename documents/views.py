@@ -52,7 +52,6 @@ def newmaptpl(request):
 
 @login_required
 def upload_document(request,mapid=None):
-	logger.error ("inside upload_document")
 	if request.method == 'GET':
 		return render_to_response('documents/document_upload.html',
 								  RequestContext(request,{'mapid':mapid,}),
@@ -61,17 +60,14 @@ def upload_document(request,mapid=None):
 
 	elif request.method == 'POST':
 		try:
-			logger.error ("1")
 			mapid = str(request.POST['map'])
 			file = request.FILES['file']
 			title = request.POST['title']
 			document = Document(title=title, file=file)
 			if request.user.is_authenticated(): document.owner = request.user
 			document.save()
-			logger.error ("2")
 			document.set_default_permissions()
 			document.maps.add(Map.objects.get(id=mapid))
-			logger.error ("10")
 		except Exception as e:
 			logger.error ('Error inside document upload ' + str (e) )
 		return HttpResponse(json.dumps({'success': True,'redirect_to':'/maps/' + str(mapid)}))
