@@ -67,6 +67,10 @@ def upload_document(request,mapid=None):
 			if request.user.is_authenticated(): document.owner = request.user
 			document.save()
 			document.set_default_permissions()
+			permissionsStr = request.REQUEST['documentPermissions']
+			permissions = json.loads(permissionsStr)
+			set_document_permissions( document, permissions)
+			
 			document.maps.add(Map.objects.get(id=mapid))
 		except Exception as e:
 			logger.error ('Error inside document upload ' + str (e) )
