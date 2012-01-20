@@ -16,6 +16,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.contrib.auth.models import User
 import logging
+from anzsm.payment.utils import  getRecourseLicenseAgreement
 logger = logging.getLogger("documents")
 imgtypes = ['jpg','jpeg','tif','tiff','png','gif']
 
@@ -40,10 +41,13 @@ def documentdetail(request, docid):
 			RequestContext(request, {'error_message':
 				_("You are not allowed to view this document.")})), status=401)
 
+	license_agreement = getRecourseLicenseAgreement (document)
+	 
 	return render_to_response("documents/docinfo.html", RequestContext(request, {
 		'permissions_json': json.dumps(_perms_info(document, DOCUMENT_LEV_NAMES)),
 		'document': document,
-		'imgtypes': imgtypes
+		'imgtypes': imgtypes,
+        "license_agreement" : license_agreement,
 	}))
 
 def newmaptpl(request):
@@ -255,6 +259,9 @@ def ajax_document_permissions(request, docid):
 	)
 
 def set_document_permissions(m, perm_spec):
+	from anzsm.payment.utils import setResourceLicenseAgreement
+	setResourceLicenseAgreement ( m , perm_spec)
+        
 	if "authenticated" in perm_spec:
 		m.set_gen_level(AUTHENTICATED_USERS, perm_spec['authenticated'])
 	if "anonymous" in perm_spec:

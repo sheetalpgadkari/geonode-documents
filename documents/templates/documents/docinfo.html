@@ -6,47 +6,80 @@
     {% include "geonode/ext_header.html" %}
     {% include "geonode/app_header.html" %}
     {% include "geonode/geo_header.html" %}
+    
+	    
+	 <script type="text/javascript">
+
+	 	function toggleLiceneseAgreement() {
+	 		if ( document.getElementById ('acceptLicense').checked ) {
+	 			document.getElementById ('downloadBtn').disabled = false;
+	 		}else {
+	 			document.getElementById ('downloadBtn').disabled = true;
+	 		}
+	 		
+	 	}
+	 	function openPopup(url){
+	 		 
+	 		//var url = '../../../payment/license/' + document.getElementById ('license_id').value ;
+	    	popupWindow = window.open(
+	    			url,'popUpWindow','height=700,width=800,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no,status=yes')   	
+	    }
+	 </script>
+ 
     {{ block.super }}
     <script type="text/javascript">
         var app;
         Ext.onReady(function() {
-            {% has_obj_perm user document "document.change_document_permissions" as can_change_permissions %}
-            {% autoescape off %}
-
-                {% if can_change_permissions %}
-                    new GeoNode.PermissionsEditor({
-                        levels: {
-                            'admin': 'document_admin',
-                            'readwrite': 'document_readwrite',
-                            'readonly': 'document_readonly',
-                            '_none': '_none'
-                        },
-                        renderTo: "permissions_form",
-                        userLookup: "{% url geonode.views.ajax_lookup %}",
-                        permissions: {{ permissions_json }},
-                        listeners: {
-                            updated: function(perms) {
-                                var submitTo = "{% url documents.views.ajax_document_permissions document.id %}";
-                                Ext.Ajax.request({ url: submitTo, jsonData: perms.writePermissions() });
-                            }
-                        }
-                    });
-                {% endif %}
+        	{% autoescape off %}
+        	
+	            {% has_obj_perm user document "documents.change_document_permissions" as can_change_permissions %}
+	            {% if can_change_permissions %}
+	               
+	                    new GeoNode.PermissionsEditor({
+	                        levels: {
+	                            'admin': 'document_admin',
+	                            'readwrite': 'document_readwrite',
+	                            'readonly': 'document_readonly',
+	                            '_none': '_none'
+	                        },
+	                        renderTo: "permissions_form",
+	                        userLookup: "{% url geonode.views.ajax_lookup %}",
+	                        permissions: {{ permissions_json }},
+	                        listeners: {
+	                            updated: function(perms) {
+	                                var submitTo = "{% url documents.views.ajax_document_permissions document.id %}";
+	                                Ext.Ajax.request({ url: submitTo, jsonData: perms.writePermissions() });
+	                            }
+	                        }
+	                    });
+	            {% endif %}
             {% endautoescape %}
         });
     </script>
 {% endblock %}
 
+
+ 
 {% block main %}
+    
     <div class="twocol">
         <h3>{{ document.title }} (Document)</h3>
 
+		{% if license_agreement %}
+		<div  >
+			<a href="javascript:openPopup ('../../../payment/license/{{ license_agreement.payment_license.id }}')"> <b>License Agreement </b></a>
+		</div>
+		<div >
+			<INPUT TYPE=CHECKBOX NAME="acceptLicense" id="acceptLicense" onclick="javascript:toggleLiceneseAgreement()" > <b> I accept the agreement <b/></>
+		</div>
+		{% endif %} 
+		<br>
 		{% if document.type in imgtypes %}
         <div id="embedded_map">
             <img src="{{document.file.url}}" width='100%' />
         </div>
 		{% else %}
-			<a href="{{ document.file.url }}" target="_blank">Download the {{ document }} document</a>
+			<input type=button disabled="true" id="downloadBtn" onclick="javascript:openPopup('{{ document.file.url }}')" value="Download the {{ document }} document" />
 	    {%  endif %}
         <p><strong>{% trans "Contact:" %}</strong> <a
                 href="{{ document.owner.get_profile.get_absolute_url }}">{{ document.owner }}</a></p>
