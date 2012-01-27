@@ -260,8 +260,9 @@ def ajax_document_permissions(request, docid):
 
 def set_document_permissions(m, perm_spec):
 	from anzsm.payment.utils import setResourceLicenseAgreement
+	from anzsm.payment.utils import setPaymentOptions
 	setResourceLicenseAgreement ( m , perm_spec)
-        
+	setPaymentOptions (m, perm_spec)
 	if "authenticated" in perm_spec:
 		m.set_gen_level(AUTHENTICATED_USERS, perm_spec['authenticated'])
 	if "anonymous" in perm_spec:
