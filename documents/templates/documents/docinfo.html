@@ -11,11 +11,22 @@
 	 <script type="text/javascript">
 
 	 	function toggleLiceneseAgreement() {
-	 		if ( document.getElementById ('acceptLicense').checked ) {
-	 			document.getElementById ('downloadBtn').disabled = false;
-	 		}else {
-	 			document.getElementById ('downloadBtn').disabled = true;
+	 		if(!!document.getElementById ('downloadBtn')){
+		 		if ( document.getElementById ('acceptLicense').checked ) {
+		 			document.getElementById ('downloadBtn').disabled = false;
+		 		}else {
+		 			document.getElementById ('downloadBtn').disabled = true;
+		 		}
 	 		}
+	 		if(!!document.getElementById ('htmllink')){
+		 		if ( document.getElementById ('acceptLicense').checked ) {
+		 			document.getElementById ('htmllink').href = '{{document.htmllink}}';
+		 		}else {
+		 			document.getElementById ('htmllink').href = '#';
+		 		}	 			
+	 			
+	 		}
+	 		
 	 		
 	 	}
 	 	function openPopup(url){
@@ -79,7 +90,11 @@
             <img src="{{document.file.url}}" width='100%' />
         </div>
 		{% else %}
-			<input type=button disabled="true" id="downloadBtn" onclick="javascript:openPopup('{{ document.file.url }}')" value="Download the {{ document }} document" />
+			{% if document.type in html %}
+				<a disabled="true" id="htmllink" href="#" target = "_blank">Open Html Link</a>
+			{% else %}
+				<input  type=button disabled="true" id="downloadBtn" onclick="javascript:openPopup('{{ document.file.url }}')" value="Download the {{ document }} document" />
+	    	{%  endif %}
 	    {%  endif %}
         <p><strong>{% trans "Contact:" %}</strong> <a
                 href="{{ document.owner.get_profile.get_absolute_url }}">{{ document.owner }}</a></p>

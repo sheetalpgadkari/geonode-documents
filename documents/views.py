@@ -16,10 +16,11 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.contrib.auth.models import User
 import logging
+from django.utils.datastructures import MultiValueDictKeyError
 from anzsm.payment.utils import  getRecourseLicenseAgreement
 logger = logging.getLogger("documents")
 imgtypes = ['jpg','jpeg','tif','tiff','png','gif']
-
+html = ['html']
 DOCUMENT_LEV_NAMES = {
 	Document.LEVEL_NONE	 : _('No Permissions'),
 	Document.LEVEL_READ	 : _('Read Only'),
@@ -48,6 +49,7 @@ def documentdetail(request, docid):
 		'document': document,
 		'imgtypes': imgtypes,
         "license_agreement" : license_agreement,
+        "html" : html,
 	}))
 
 def newmaptpl(request):
@@ -65,9 +67,18 @@ def upload_document(request,mapid=None):
 	elif request.method == 'POST':
 		try:
 			mapid = str(request.POST['map'])
-			file = request.FILES['file']
+			file = None
+			try:
+				file = request.FILES['file']
+			except MultiValueDictKeyError as fe:
+				file = None
 			title = request.POST['title']
-			document = Document(title=title, file=file)
+			html_lnk_document = request.POST['html_lnk_document']
+			htmllink = None
+			if(html_lnk_document == "Yes"):
+				htmllink = request.POST['documentHtmlLink']
+				
+			document = Document(title=title, file=file, htmllink=htmllink)
 			if request.user.is_authenticated(): document.owner = request.user
 			document.save()
 			document.set_default_permissions()
@@ -78,6 +89,7 @@ def upload_document(request,mapid=None):
 			document.maps.add(Map.objects.get(id=mapid))
 		except Exception as e:
 			logger.error ('Error inside document upload ' + str (e) )
+			raise e
 		return HttpResponse(json.dumps({'success': True,'redirect_to':'/maps/' + str(mapid)}))
 		
 #### DOCUMENTS SEARCHING ####
@@ -167,7 +179,7 @@ def _documents_search(query, start, limit, sort_field, sort_dir):
 			'title' : document.title,
 			'detail' : reverse('documents.views.documentdetail', args=(document.id,)),
 			'owner' : owner_name,
-			'owner_detail' : reverse('profiles.views.profile_detail', args=(document.owner.username,)),
+			#'owner_detail' : reverse('profiles.views.profile_detail', args=(document.owner.username,)),
 			'maps': [(map.id,map.title) for map in document.maps.all()],
 			'type': document.type
 			}

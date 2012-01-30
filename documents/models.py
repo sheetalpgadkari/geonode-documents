@@ -18,6 +18,7 @@ class Document(models.Model,PermissionLevelMixin):
 	maps = models.ManyToManyField(Map)
 	file = models.FileField(upload_to='documents')
 	type = models.CharField(max_length=128,blank=True,null=True)
+	htmllink = models.CharField(max_length=128,blank=True,null=True)
 	owner = models.ForeignKey(User, verbose_name='owner', blank=True, null=True)
 
 	def __unicode__(self):
@@ -54,7 +55,10 @@ class Document(models.Model,PermissionLevelMixin):
 			self.set_user_level(self.owner, self.LEVEL_ADMIN) 
 
 def pre_save_document(instance, sender, **kwargs):
-	base_name, extension = os.path.splitext(instance.file.name)
-	instance.type=extension[1:]
-
+	if(instance.htmllink is None):
+		base_name, extension = os.path.splitext(instance.file.name)
+		instance.type=extension[1:]
+	elif(instance.htmllink is not None):
+		instance.type = 'html'
+			
 signals.pre_save.connect(pre_save_document, sender=Document)
