@@ -2,7 +2,7 @@ from geonode.maps.views import _perms_info
 from geonode.core.models import AUTHENTICATED_USERS, ANONYMOUS_USERS
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse
-from geonode.maps.models import Map, Contact
+from geonode.maps.models import Map, Contact, Layer
 import json
 from django.template import RequestContext, loader
 from django.utils.translation import ugettext as _
@@ -66,7 +66,7 @@ def upload_document(request,mapid=None):
 
 	elif request.method == 'POST':
 		try:
-			mapid = str(request.POST['map'])
+			resourceId = str(request.POST['map'])
 			file = None
 			try:
 				file = request.FILES['file']
@@ -86,7 +86,13 @@ def upload_document(request,mapid=None):
 			permissions = json.loads(permissionsStr)
 			set_document_permissions( document, permissions)
 			
-			document.maps.add(Map.objects.get(id=mapid))
+			if (resourceId != "" and float(resourceId)):
+				docMap = Map.objects.get (id=resourceId)
+				if docMap is not None:
+					document.maps.add(docMap)
+				docLayer = Layer.objects.get(id=resourceId)
+				if docLayer is not None:
+					document.layers.add(docLayer)	
 		except Exception as e:
 			logger.error ('Error inside document upload ' + str (e) )
 			raise e

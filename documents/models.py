@@ -1,5 +1,6 @@
 from django.db import models
 from geonode.maps.models import Map
+from geonode.maps.models import Layer
 from django.db.models import signals
 import os
 from django.contrib.auth.models import User
@@ -15,7 +16,8 @@ class Document(models.Model,PermissionLevelMixin):
 	"""
 
 	title = models.CharField(max_length=255)
-	maps = models.ManyToManyField(Map)
+	maps = models.ManyToManyField(Map, blank=True,null=True)
+	layers = models.ManyToManyField(Layer, blank=True,null=True)
 	file = models.FileField(upload_to='documents')
 	type = models.CharField(max_length=128,blank=True,null=True)
 	htmllink = models.CharField(max_length=128,blank=True,null=True)
