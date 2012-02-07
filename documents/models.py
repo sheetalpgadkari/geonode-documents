@@ -22,7 +22,9 @@ class Document(models.Model,PermissionLevelMixin):
 	type = models.CharField(max_length=128,blank=True,null=True)
 	htmllink = models.CharField(max_length=128,blank=True,null=True)
 	owner = models.ForeignKey(User, verbose_name='owner', blank=True, null=True)
+	date = models.DateTimeField(auto_now_add=True, blank=True)
 
+	
 	def __unicode__(self):
 		return self.title
 
