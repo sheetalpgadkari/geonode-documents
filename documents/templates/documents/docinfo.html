@@ -93,7 +93,16 @@
 			{% if document.type in html %}
 				<a disabled="true" id="htmllink" href="#" target = "_blank">Open Html Link</a>
 			{% else %}
-				<input  type=button disabled="true" id="downloadBtn" onclick="javascript:openPopup('{{ document.file.url }}')" value="Download the {{ document }} document" />
+	          {% has_obj_perm user document "documents.change_document_permissions" as can_change_permissions %}
+			
+			  {% if can_change_permissions %}
+			 
+				<input  type=button  id="downloadBtn" onclick="javascript:openPopup('{{ document.file.url }}')" value="Download the {{ document }} document" />
+	    	  {% else %}
+	    	 
+				<input  type=button disabled="true" id="downloadBtn" onclick="javascript:openPopup('{{ document.file.url }}')" value="Download the {{ document }} document" />	    	  
+	    	  {% endif %}
+	    	
 	    	{%  endif %}
 	    {%  endif %}
         <p><strong>{% trans "Contact:" %}</strong> <a

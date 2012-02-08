@@ -250,6 +250,7 @@ def _split_query(query):
 		keywords.append(accum)
 	return [kw.strip() for kw in keywords if kw.strip()]
 
+@csrf_exempt
 def ajax_document_permissions(request, docid):
 	document = get_object_or_404(Document, pk=docid)
 
