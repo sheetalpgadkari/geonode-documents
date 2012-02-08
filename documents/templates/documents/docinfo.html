@@ -80,7 +80,7 @@
 			  
 		{% if license_agreement %}
 		<div  >
-			<a href="javascript:openPopup ('../../../payment/license/{{ license_agreement.payment_license.id }}')"> <b>License Agreement </b></a>
+			<a href="javascript:openPopup ('../../../payment/license/{{ license_agreement.payment_license.id }}')"> <b>{{ license_agreement.payment_license.title }}  </b>(License Agreement) </a>
 		</div>
 
 	    {% has_obj_perm user document "documents.change_document_permissions" as can_change_permissions %}
