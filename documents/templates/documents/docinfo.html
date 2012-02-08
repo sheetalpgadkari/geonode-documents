@@ -82,11 +82,14 @@
 		<div  >
 			<a href="javascript:openPopup ('../../../payment/license/{{ license_agreement.payment_license.id }}')"> <b>License Agreement </b></a>
 		</div>
-		{% has_obj_perm user document "documents.change_document_permissions" as can_change_permissions %}
-		{% if not can_change_permissions %}
-		<div >
-			<INPUT TYPE=CHECKBOX NAME="acceptLicense" id="acceptLicense" onclick="javascript:toggleLiceneseAgreement()" > <b> I accept the agreement <b/></>
-		</div>
+	    {% has_obj_perm user document "documents.change_document_permissions" as can_change_permissions %}
+		
+		{% if can_change_permissions %}
+		
+		{% else %}
+			<div >
+				<INPUT TYPE=CHECKBOX NAME="acceptLicense" id="acceptLicense" onclick="javascript:toggleLiceneseAgreement()" > <b> I accept the agreement <b/></>
+			</div>
 		{% endif %} 
 		{%  endif %}
 		<br>
