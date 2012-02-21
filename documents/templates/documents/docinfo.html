@@ -102,7 +102,12 @@
         </div>
 		{% else %}
 			{% if document.type in html %}
-				<a disabled="true" id="htmllink" href="#" target = "_blank">Open Html Link</a>
+		          {% has_obj_perm user document "documents.change_document_permissions" as can_change_permissions %}
+				  {% if can_change_permissions %}
+			  		<a  id="htmllink" href='{{document.htmllink}}' target = "_blank">Open Html Link</a>
+			 	  {% else %}
+					<a disabled="true" id="htmllink" href="#" target = "_blank">Open Html Link</a>
+				  {% endif %}	
 			{% else %}
 	          {% has_obj_perm user document "documents.change_document_permissions" as can_change_permissions %}
 			
