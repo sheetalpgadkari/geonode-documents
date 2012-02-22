@@ -106,7 +106,12 @@
 				  {% if can_change_permissions %}
 			  		<a  id="htmllink" href='{{document.htmllink}}' target = "_blank">Open Html Link</a>
 			 	  {% else %}
-					<a disabled="true" id="htmllink" href="#" target = "_blank">Open Html Link</a>
+				 	  	{% if license_agreement %}
+				 	  		<a disabled="true" id="htmllink" href="#" target = "_blank"><b>Open Html Link </b></a>
+				 	  		<br>(please accept the license to open the link)
+				 	  	{% else %}
+							<a  id="htmllink" href='{{document.htmllink}}' target = "_blank">Open Html Link</a>
+						{%  endif %}		
 				  {% endif %}	
 			{% else %}
 	          {% has_obj_perm user document "documents.change_document_permissions" as can_change_permissions %}
