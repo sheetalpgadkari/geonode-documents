@@ -153,12 +153,12 @@ def documents_search(request):
 	sort_field = params.get('sort', u'')
 	sort_field = unicodedata.normalize('NFKD', sort_field).encode('ascii','ignore')	 
 	sort_dir = params.get('dir', 'ASC')
-	result = _documents_search(query, start, limit, sort_field, sort_dir)
+	result = _documents_search(query, start, limit, sort_field, sort_dir, request.user)
 
 	result['success'] = True
 	return HttpResponse(json.dumps(result), mimetype="application/json")
 
-def _documents_search(query, start, limit, sort_field, sort_dir):
+def _documents_search(query, start, limit, sort_field, sort_dir, user):
 
 	keywords = _split_query(query)
 
@@ -179,11 +179,16 @@ def _documents_search(query, start, limit, sort_field, sort_dir):
 			owner_name = Contact.objects.get(user=document.owner).name
 		except:
 			owner_name = document.owner.first_name + " " + document.owner.last_name
-
+		hasperm = user.has_perm('documents.view_document', obj=document)
+		detail = None
+		if(hasperm):
+			detail = reverse('documents.views.documentdetail', args=(document.id,))
+		else:
+			detail = reverse('anzsm.payment.views.paymentForDataSet', args=('document', document.id,))		
 		mapdict = {
 			'id' : document.id,
 			'title' : document.title,
-			'detail' : reverse('documents.views.documentdetail', args=(document.id,)),
+			'detail' : detail,
 			'owner' : owner_name,
 			#'owner_detail' : reverse('profiles.views.profile_detail', args=(document.owner.username,)),
 			'maps': [(map.id,map.title) for map in document.maps.all()],
