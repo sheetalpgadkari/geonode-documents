@@ -17,7 +17,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 import logging
 from django.utils.datastructures import MultiValueDictKeyError
-from anzsm.payment.utils import  getRecourseLicenseAgreement
+from anzsm.payment.utils import  getRecourseLicenseAgreement, getResourceViewMode
 logger = logging.getLogger("documents")
 imgtypes = ['jpg','jpeg','tif','tiff','png','gif']
 html = ['html']
@@ -43,7 +43,7 @@ def documentdetail(request, docid):
 				_("You are not allowed to view this document.")})), status=401)
 
 	license_agreement = getRecourseLicenseAgreement (document)
-	 
+	
 	return render_to_response("documents/docinfo.html", RequestContext(request, {
 		'permissions_json': json.dumps(_perms_info(document, DOCUMENT_LEV_NAMES)),
 		'document': document,
@@ -283,9 +283,10 @@ def ajax_document_permissions(request, docid):
 	)
 
 def set_document_permissions(m, perm_spec):
-	from anzsm.payment.utils import setResourceLicenseAgreement
+	from anzsm.payment.utils import setResourceLicenseAgreement, setResourceViewMode
 	from anzsm.payment.utils import setPaymentOptions
 	setResourceLicenseAgreement ( m , perm_spec)
+	setResourceViewMode(m, perm_spec)
 	setPaymentOptions (m, perm_spec)
 	if "authenticated" in perm_spec:
 		m.set_gen_level(AUTHENTICATED_USERS, perm_spec['authenticated'])
