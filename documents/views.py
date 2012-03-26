@@ -17,7 +17,11 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 import logging
 from django.utils.datastructures import MultiValueDictKeyError
-from anzsm.payment.utils import  getRecourseLicenseAgreement, getResourceViewMode
+
+from anzsm.payment.utils import  getRecourseLicenseAgreement
+
+from urllib import urlencode
+
 logger = logging.getLogger("documents")
 imgtypes = ['jpg','jpeg','tif','tiff','png','gif']
 html = ['html']
